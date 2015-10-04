@@ -5,8 +5,12 @@ import edu.wctc.mpatel.bookwebapp1.model.AuthorDaoStrategy;
 import edu.wctc.mpatel.bookwebapp1.model.AuthorService;
 import edu.wctc.mpatel.bookwebapp1.model.DBStrategy;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,12 +23,16 @@ public class AuthorController extends HttpServlet {
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String ADD_PAGE = "/authorInputForm.jsp";
+    private static final String UPDATE_PAGE = "/authorEditForm.jsp";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "add";
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
+    private static final String UPDATE_DELETE_ACTION = "updateDelete";
     private static final String ACTION_PARAM = "action";
     private static final String SUBMIT_ACTION = "submit";
+    private static final String AUTHOR_INPUT = "inputData";
+    private static final String UPDATE_INPUT = "editData";
 
     private String driverClass;
     private String url;
@@ -35,19 +43,24 @@ public class AuthorController extends HttpServlet {
     private DBStrategy db;
     private AuthorDaoStrategy authorDao;
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+        System.out.println("Statement at start");
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
-        
-        
+
         try {
-           
+
             AuthorService authService = injectDependenciesAndGetAuthorService();
 
-          
             switch (action) {
                 case LIST_ACTION:
                     this.refreshList(request, authService);
@@ -55,54 +68,66 @@ public class AuthorController extends HttpServlet {
                     break;
 
                 case ADD_ACTION:
-                    
-                    String subAction = request.getParameter(SUBMIT_ACTION);
-                    
-                    
-//                    if (subAction.equals(ADD_EDIT_ACTION)) {
-//                        // must be add or edit, go to addEdit page
-//                        String[] authorIds = request.getParameterValues("authorId");
-//                        if (authorIds == null) {
-//                            // must be an add action, nothing to do but
-//                            // go to edit page
-//                        } else {
-//                            // must be an edit action, need to get data
-//                            // for edit and then forward to edit page
-//                            
-//                            // Only process first row selected
-//                            String authorId = authorIds[0];
-//                            Author author = authService.getAuthorById(authorId);
-//                            request.setAttribute("author", author);
-//                        }
-//
-//                        destination = ADD_EDIT_PAGE;
-//
-//                    } else {
-//                        // must be DELETE
-//                        // get array based on records checked
-//                        String[] authorIds = request.getParameterValues("authorId");
-//                        for (String id : authorIds) {
-//                            authService.deleteAuthorById(id);
-//                        }
-//
-//                        this.refreshList(request, authService);
-//                        destination = LIST_PAGE;
-//                    }
-                    break;
-                    
-                case UPDATE_ACTION:
-//                    String authorName = request.getParameter("authorName");
-//                    String authorId = request.getParameter("authorId");
-//                    authService.saveOrUpdateAuthor(authorId, authorName);
-//                    this.refreshList(request, authService);
-//                    destination = LIST_PAGE;
-                    break;
-                    
-                case DELETE_ACTION:
-//                    this.refreshList(request, authService);
-//                    destination = LIST_PAGE;
+
+                    destination = ADD_PAGE;
+                    System.out.println("Statement after add page destinatin set");
+
                     break;
 
+                case AUTHOR_INPUT:
+                    String authorName = request.getParameter("authorName");
+                    String dateCreated = request.getParameter("dateCreated");
+                    DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date = format.parse(dateCreated);
+                    Author author = new Author(authorName, date);
+                    authService.addNewAuthor(author);
+                    this.refreshList(request, authService);
+                    destination = LIST_PAGE;
+                    break;
+
+                case UPDATE_ACTION:
+                    String authorId = request.getParameter("updateAuthor");
+
+                    Author editAuthor = authService.getAuthorById(authorId);
+                    request.setAttribute("author", editAuthor);
+                    destination = UPDATE_PAGE;
+                    break;
+
+                case UPDATE_INPUT:
+
+                    String authorId1 = request.getParameter("authorId");
+                    String authorName1 = request.getParameter("authorName");
+                    String dateCreated1 = request.getParameter("dateCreated");
+                    DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date1 = format1.parse(dateCreated1);
+                    Author author1 = new Author(Integer.parseInt(authorId1), authorName1, date1);
+                    authService.updateAuthor(author1);
+                    this.refreshList(request, authService);
+                    destination = LIST_PAGE;
+
+                case DELETE_ACTION:
+                    authService.deleteAuthorById(request.getParameter("deleteAuthor"));
+                    this.refreshList(request, authService);
+
+                    break;
+
+                case UPDATE_DELETE_ACTION:
+                    String subAction = request.getParameter(SUBMIT_ACTION);
+
+                    if (subAction.equals(DELETE_ACTION)) {
+                        authService.deleteAuthorById(request.getParameter("deleteAuthor"));
+                        this.refreshList(request, authService);
+
+                    } else if (subAction.equals(UPDATE_ACTION)) {
+                        String authorId2 = request.getParameter("updateAuthor");
+
+                        Author editAuthor2 = authService.getAuthorById(authorId2);
+                        request.setAttribute("author", editAuthor2);
+                        destination = UPDATE_PAGE;
+
+                    }
+
+                    break;
                 default:
                     // no param identified in request, must be an error
                     request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
@@ -110,17 +135,26 @@ public class AuthorController extends HttpServlet {
                     break;
             }
 
+        } catch (IllegalArgumentException iae) {
+            request.setAttribute("errMsg", iae.getMessage());
+        } catch (SQLException e) {
+            request.setAttribute("errMsg", e.getCause().getMessage());
+        } catch (ClassNotFoundException cnfe) {
+            request.setAttribute("errMsg", cnfe.getCause().getMessage());
+        } catch (ParseException pe) {
+            request.setAttribute("errMsg", pe.getMessage());
         } catch (Exception e) {
             request.setAttribute("errMsg", e.getCause().getMessage());
         }
 
+        System.out.println("Statement before request Dispatcher");
         // Forward to destination page
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
     }
 
-    private void refreshList(HttpServletRequest request, AuthorService authService) throws Exception {
+    private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException {
         List<Author> authors = authService.listAllAuthors();
         request.setAttribute("authors", authors);
     }
@@ -131,10 +165,14 @@ public class AuthorController extends HttpServlet {
         DBStrategy db = (DBStrategy) dbClass.newInstance();
         AuthorDaoStrategy authorDao = null;
         Class daoClass = Class.forName(daoClassName);
+
+        //  try{
         Constructor constructor = daoClass.getConstructor(new Class[]{
             DBStrategy.class, String.class, String.class, String.class, String.class
         });
-
+        // } catch(NoSuchMethodException nsme){
+        //do something
+        // }
         // if (constructor != null) {
         Object[] constructorArgs = new Object[]{
             db, driverClass, url, userName, password
@@ -142,7 +180,7 @@ public class AuthorController extends HttpServlet {
         authorDao = (AuthorDaoStrategy) constructor
                 .newInstance(constructorArgs);
 
-      //  } else {
+        //  } else {
 //            Context ctx = new InitialContext();
 //            DataSource ds = (DataSource) ctx.lookup("jdbc/book");
 //            constructor = daoClass.getConstructor(new Class[]{

@@ -8,18 +8,23 @@ public class MySqlDb implements DBStrategy {
     private Connection conn;
 
     @Override
-    public void openConnection(String driverClass, String url, String userName, String password) throws Exception {
+    public void openConnection(String driverClass, String url, String userName, String password) throws SQLException, ClassNotFoundException {
+        //class not found exception
         Class.forName(driverClass);
+
+        //SQL Exception
         conn = DriverManager.getConnection(url, userName, password);
     }
 
     @Override
     public void closeConnection() throws SQLException {
+        //SQL Exception
         conn.close();
     }
 
     @Override
     public final List<Map<String, Object>> findAllRecords(String tableName) throws SQLException {
+
         List<Map<String, Object>> records = new ArrayList<>();
         String sql = "SELECT * FROM " + tableName;
         Statement stmt = conn.createStatement();
@@ -34,6 +39,37 @@ public class MySqlDb implements DBStrategy {
             records.add(record);
         }
         return records;
+    }
+
+    public final Map<String, Object> findRecordByPrimaryKey(String tableName, String primaryKeyFieldName, String primaryKeyValue) throws SQLException {
+
+        PreparedStatement pstmt = null;
+        pstmt = buildFindRecordByPrimaryKeyStatement(conn, tableName, primaryKeyFieldName);
+        pstmt.setObject(1, primaryKeyValue);
+
+        Map<String, Object> record = new HashMap<>();
+        ResultSet rs = pstmt.executeQuery();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int colCount = metaData.getColumnCount();
+        while (rs.next()) {
+            for (int i = 1; i <= colCount; i++) {
+                record.put(metaData.getColumnName(i), rs.getObject(i));
+            }
+
+        }
+
+        return record;
+
+    }
+
+    private PreparedStatement buildFindRecordByPrimaryKeyStatement(Connection connect, String tableName, String primaryKeyFieldName) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT * FROM ");
+        sql.append(tableName);
+
+        sql.append(" WHERE ").append(primaryKeyFieldName).append(" = ?");
+
+        return connect.prepareStatement(sql.toString());
+
     }
 
     @Override
@@ -148,6 +184,10 @@ public class MySqlDb implements DBStrategy {
         for (Map record : records) {
             System.out.println(record);
         }
+
+        Map<String, Object> mapRec = db.findRecordByPrimaryKey("author", "author_id", "2");
+
+        System.out.println(mapRec);
 
         db.closeConnection();
     }

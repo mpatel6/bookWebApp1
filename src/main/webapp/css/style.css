@@ -1,0 +1,40 @@
+
+
+/* This is element selector  */
+h1, p{
+    /* This is single line comment*/
+    color: red;
+    text-align: center;
+    
+}
+
+
+/*This is id selector*/
+#para1{
+    text-align: right;
+    color: blue;
+}
+
+
+/*This is class selector*/
+.classCenter{
+    text-align: left;
+    color:yellow;
+}
+
+p.classLeft{
+    text-align: left;
+    margin-left: 30px;
+    color: pink;
+}
+
+body{
+    background-color: gray;
+    
+    /*
+    background-image: url("gradient_bg.png");
+    background-repeat: repeat-x;
+    background-position: right top;
+    background: #ffffff url("img_tree.png") no-repeat right top;
+    */
+}

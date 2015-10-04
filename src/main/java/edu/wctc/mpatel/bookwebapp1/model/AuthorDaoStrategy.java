@@ -7,12 +7,13 @@ import java.util.List;
 
 public interface AuthorDaoStrategy {
 
-    public void deleteAuthorById(Integer authorId) throws Exception;
+    public void deleteAuthorById(String authorId) throws ClassNotFoundException, SQLException;
 
-    public List<Author> listAllAuthors() throws SQLException, Exception;
+    public List<Author> listAllAuthors() throws SQLException, ClassNotFoundException;
 
-    public void addNewAuthor(Author author) throws Exception;
+    public void addNewAuthor(Author author) throws SQLException, ClassNotFoundException;
 
-    public void updateAuthor(Author author) throws Exception;
+    public void updateAuthor(Author author) throws SQLException, ClassNotFoundException;
     
+    public Author getAuthorById(String authorId) throws SQLException, ClassNotFoundException;
 }

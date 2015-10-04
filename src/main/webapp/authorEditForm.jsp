@@ -13,10 +13,11 @@
     </head>
     <body>
         
-        <form id="authorData" name="authorData" method="POST" action="AuthorController?action=inputData">
-        <h1>Author Information Input Page</h1>
-        <input type="text" id="authorName" name="authorName" placeholder="Enter Author Name" >
-        <input type="text" id="dateCreated" name="dateCreated" placeholder="Enter Date Created YYYY-MM-DD" >
+        <form id="authorEditData" name="authorEditData" method="POST" action="AuthorController?action=editData">
+        <h1>Author Edit Page</h1>
+         <input type="text" id="authorId" name="authorId" value="${author.getAuthorId()}">
+        <input type="text" id="authorName" name="authorName" value="${author.getAuthorName()}">
+        <input type="text" id="dateCreated" name="dateCreated" value="${author.dateCreated}">
         <input type="submit" id="authorInputSubmit" name="submit" value="Submit"   >
         </form>
     </body>

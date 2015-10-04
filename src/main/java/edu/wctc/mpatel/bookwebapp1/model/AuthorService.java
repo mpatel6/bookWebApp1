@@ -1,5 +1,6 @@
 package edu.wctc.mpatel.bookwebapp1.model;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +13,23 @@ public class AuthorService {
         this.dao = dao;
     }
 
-    public List<Author> listAllAuthors() throws Exception {
+    public List<Author> listAllAuthors() throws SQLException, ClassNotFoundException {
         return dao.listAllAuthors();
     }
 
-    public void deleteAuthorById(Integer recordValue) throws Exception {
+     public Author getAuthorById(String authorId) throws SQLException, ClassNotFoundException {
+        return dao.getAuthorById(authorId);
+    }
+     
+    public void deleteAuthorById(String recordValue) throws SQLException, ClassNotFoundException {
         dao.deleteAuthorById(recordValue);
     }
 
-    public void addNewAuthor(Author author) throws Exception {
+    public void addNewAuthor(Author author) throws SQLException, ClassNotFoundException {
         dao.addNewAuthor(author);
     }
 
-    public void updateAuthor(Author author) throws Exception {
+    public void updateAuthor(Author author) throws SQLException, ClassNotFoundException {
         dao.updateAuthor(author);
     }
 

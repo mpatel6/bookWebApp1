@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,9 +16,8 @@ public class AuthorDao implements AuthorDaoStrategy {
     private String userName;
     private String password;
 
-    public AuthorDao() {    }
-
-    
+    public AuthorDao() {
+    }
 
     public AuthorDao(DBStrategy db, String driverClass, String url, String userName, String password) {
         this.db = db;
@@ -28,15 +28,16 @@ public class AuthorDao implements AuthorDaoStrategy {
     }
 
     @Override
-    public void deleteAuthorById(Integer authorId) throws Exception {
+    public void deleteAuthorById(String authorId) throws SQLException, ClassNotFoundException {
         db.openConnection(driverClass, url, userName, password);
-        int noOfRecordDeleted = db.deleteRecordById("author", "author_id", authorId);
+        Integer authorID = Integer.parseInt(authorId);
+        int noOfRecordDeleted = db.deleteRecordById("author", "author_id", authorID);
         db.closeConnection();
 
     }
 
     @Override
-    public void addNewAuthor(Author author) throws Exception {
+    public void addNewAuthor(Author author) throws SQLException, ClassNotFoundException {
         db.openConnection(driverClass, url, userName, password);
 
         List<String> recordFields = Arrays.asList("author_name", "date_created");
@@ -47,7 +48,7 @@ public class AuthorDao implements AuthorDaoStrategy {
     }
 
     @Override
-    public void updateAuthor(Author author) throws Exception {
+    public void updateAuthor(Author author) throws SQLException, ClassNotFoundException {
         db.openConnection(driverClass, url, userName, password);
 
         List<String> recordFields = Arrays.asList("author_name", "date_created");
@@ -59,7 +60,28 @@ public class AuthorDao implements AuthorDaoStrategy {
     }
 
     @Override
-    public List<Author> listAllAuthors() throws SQLException, Exception {
+    public Author getAuthorById(String authorId) throws SQLException, ClassNotFoundException {
+        db.openConnection(driverClass, url, userName, password);
+
+        Map<String, Object> rawData = new HashMap<>();
+        rawData = db.findRecordByPrimaryKey("Author", "author_id", authorId);
+        Author author = new Author();
+        Object obj = rawData.get("author_id");
+        author.setAuthorId(Integer.parseInt(obj.toString()));
+
+        String authorName = rawData.get("author_name") == null ? "" : rawData.get("author_name").toString();
+        author.setAuthorName(authorName);
+
+        obj = rawData.get("date_created");
+        Date dateCreated = (Date) rawData.get("date_created");
+        author.setDateCreated(dateCreated);
+        db.closeConnection();
+
+        return author;
+    }
+
+    @Override
+    public List<Author> listAllAuthors() throws SQLException, ClassNotFoundException {
         db.openConnection(driverClass, url, userName, password);
         List<Author> authorList = new ArrayList<>();
 
@@ -91,27 +113,29 @@ public class AuthorDao implements AuthorDaoStrategy {
 //                "jdbc:mysql://localhost:3306/book2",
 //                "root",
 //                "admin");
-//
-////        int noOfRecordsDeleted = dao.deleteAuthorById("author","author_id","11");
-////        System.out.println("Number of Records Deleted = " + noOfRecordsDeleted);
-//        List<Object> recordValues = new ArrayList<>();
-//        recordValues.add("David Shah");
-//        recordValues.add("2015-05-06");
-//
-//        List<String> recordFields = new ArrayList<>();
-//        recordFields.add("author_name");
-//        recordFields.add("date_created");
-//
-////        int noOfRecordsInserted = dao.addNewAuthor("author",recordFields,recordValues);
-////        System.out.println("Number of Records Added = " + noOfRecordsInserted);
-////        int noOfRecordsUpdated = dao.updateAuthor("author","author_id","12",recordFields,recordValues);
-////        System.out.println("Number of Records Added = " + noOfRecordsUpdated);
-//        List<Author> authorList = new ArrayList<>();
-//        authorList = dao.listAllAuthors();
-//
-//        for (Author author : authorList) {
-//            System.out.println(author);
-//        }
-//
+////
+//////        int noOfRecordsDeleted = dao.deleteAuthorById("author","author_id","11");
+//////        System.out.println("Number of Records Deleted = " + noOfRecordsDeleted);
+////        List<Object> recordValues = new ArrayList<>();
+////        recordValues.add("David Shah");
+////        recordValues.add("2015-05-06");
+////
+////        List<String> recordFields = new ArrayList<>();
+////        recordFields.add("author_name");
+////        recordFields.add("date_created");
+////
+//////        int noOfRecordsInserted = dao.addNewAuthor("author",recordFields,recordValues);
+//////        System.out.println("Number of Records Added = " + noOfRecordsInserted);
+//////        int noOfRecordsUpdated = dao.updateAuthor("author","author_id","12",recordFields,recordValues);
+//////        System.out.println("Number of Records Added = " + noOfRecordsUpdated);
+////        List<Author> authorList = new ArrayList<>();
+////        authorList = dao.listAllAuthors();
+////
+////        for (Author author : authorList) {
+////            System.out.println(author);
+////        }
+//        Author author = dao.getAuthorById("2");
+//        System.out.println(author);
 //    }
+
 }

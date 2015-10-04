@@ -38,8 +38,14 @@ public class Author {
         return authorName;
     }
 
-    public void setAuthorName(String authorName) {
+    public void setAuthorName(String authorName) throws IllegalArgumentException {
+        
+        if(authorName == null ){
+            //|| authorName.isEmpty()
+            throw new IllegalArgumentException("Illegal Name");
+        }
         this.authorName = authorName;
+        
     }
 
     public Integer getAuthorId() {
