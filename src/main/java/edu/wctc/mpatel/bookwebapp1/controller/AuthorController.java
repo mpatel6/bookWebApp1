@@ -12,11 +12,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 public class AuthorController extends HttpServlet {
 
@@ -42,6 +45,7 @@ public class AuthorController extends HttpServlet {
     private String daoClassName;
     private DBStrategy db;
     private AuthorDaoStrategy authorDao;
+    private String databaseName;
 
     /**
      *
@@ -144,11 +148,10 @@ public class AuthorController extends HttpServlet {
         } catch (ParseException pe) {
             request.setAttribute("errMsg", pe.getMessage());
         } catch (Exception e) {
-            request.setAttribute("errMsg", e.getCause().getMessage());
+            request.setAttribute("errMsg", e.getMessage());
         }
 
-        System.out.println("Statement before request Dispatcher");
-        // Forward to destination page
+        
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
@@ -165,32 +168,32 @@ public class AuthorController extends HttpServlet {
         DBStrategy db = (DBStrategy) dbClass.newInstance();
         AuthorDaoStrategy authorDao = null;
         Class daoClass = Class.forName(daoClassName);
-
-        //  try{
-        Constructor constructor = daoClass.getConstructor(new Class[]{
-            DBStrategy.class, String.class, String.class, String.class, String.class
-        });
-        // } catch(NoSuchMethodException nsme){
-        //do something
-        // }
-        // if (constructor != null) {
-        Object[] constructorArgs = new Object[]{
-            db, driverClass, url, userName, password
-        };
-        authorDao = (AuthorDaoStrategy) constructor
-                .newInstance(constructorArgs);
-
-        //  } else {
-//            Context ctx = new InitialContext();
-//            DataSource ds = (DataSource) ctx.lookup("jdbc/book");
-//            constructor = daoClass.getConstructor(new Class[]{
-//                DataSource.class, DBStrategy.class
-//            });
-//            Object[] constructorArgs = new Object[]{
-//                ds, db
-//            };
-//            authorDao = (AuthorDaoStrategy) constructor
-//                    .newInstance(constructorArgs);
+        Constructor constructor =  null;
+//          try{
+//         constructor = daoClass.getConstructor(new Class[]{
+//            DBStrategy.class, String.class, String.class, String.class, String.class
+//        });
+//         } catch(NoSuchMethodException nsme){
+//        
+//         }
+//         if (constructor != null) {
+//        Object[] constructorArgs = new Object[]{
+//            db, driverClass, url, userName, password
+//        };
+//        authorDao = (AuthorDaoStrategy) constructor
+//                .newInstance(constructorArgs);
+//
+//          } else {
+            Context ctx = new InitialContext();
+            DataSource ds = (DataSource) ctx.lookup("jdbc/book2");
+            constructor = daoClass.getConstructor(new Class[]{
+                DBStrategy.class, DataSource.class 
+            });
+            Object[] constructorArgs = new Object[]{
+                db, ds
+            };
+            authorDao = (AuthorDaoStrategy) constructor
+                    .newInstance(constructorArgs);
 //        }
         return new AuthorService(authorDao);
     }
@@ -204,6 +207,7 @@ public class AuthorController extends HttpServlet {
         password = getServletContext().getInitParameter("password");
         dbStrategyClassName = this.getServletContext().getInitParameter("dbStrategy");
         daoClassName = this.getServletContext().getInitParameter("authorDao");
+        databaseName = getServletContext().getInitParameter("databaseName");
 
     }
 

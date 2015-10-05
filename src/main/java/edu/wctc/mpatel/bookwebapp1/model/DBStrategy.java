@@ -3,10 +3,13 @@ package edu.wctc.mpatel.bookwebapp1.model;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 public interface DBStrategy {
 
     public void closeConnection() throws SQLException;
+    
+    public  void openConnection(DataSource ds) throws SQLException;
 
     public int deleteRecordById(String tableName, String recordField, Object recordValue) throws SQLException;
 

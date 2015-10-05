@@ -5,12 +5,16 @@
         <param-value>edu.wctc.mpatel.bookwebapp1.model.MySqlDb</param-value>
     </context-param>
     <context-param>
+        <param-name>databaseName</param-name>
+        <param-value>jdbc/book2</param-value>
+    </context-param>
+    <context-param>
         <param-name>AuthorController</param-name>
         <param-value>edu.wctc.mpatel.bookwebapp1.controller.AuthorController</param-value>
     </context-param>
     <context-param>
         <param-name>authorDao</param-name>
-        <param-value>edu.wctc.mpatel.bookwebapp1.model.AuthorDao</param-value>
+        <param-value>edu.wctc.mpatel.bookwebapp1.model.ConnPoolAuthorDao</param-value>
     </context-param>
     <context-param>
         <param-name>driverClass</param-name>

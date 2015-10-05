@@ -2,6 +2,7 @@ package edu.wctc.mpatel.bookwebapp1.model;
 
 import java.sql.*;
 import java.util.*;
+import javax.sql.DataSource;
 
 public class MySqlDb implements DBStrategy {
 
@@ -20,6 +21,11 @@ public class MySqlDb implements DBStrategy {
     public void closeConnection() throws SQLException {
         //SQL Exception
         conn.close();
+    }
+    
+    @Override
+     public final void openConnection(DataSource ds) throws SQLException {
+        conn = ds.getConnection();
     }
 
     @Override
