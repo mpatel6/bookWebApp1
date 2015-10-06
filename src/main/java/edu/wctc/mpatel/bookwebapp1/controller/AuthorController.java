@@ -31,7 +31,7 @@ public class AuthorController extends HttpServlet {
     private static final String ADD_ACTION = "add";
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
-    private static final String UPDATE_DELETE_ACTION = "updateDelete";
+    private static final String UPDATE_DELETE_ADD_ACTION = "updateDeleteAdd";
     private static final String ACTION_PARAM = "action";
     private static final String SUBMIT_ACTION = "submit";
     private static final String AUTHOR_INPUT = "inputData";
@@ -57,7 +57,6 @@ public class AuthorController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        System.out.println("Statement at start");
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
 
@@ -72,10 +71,8 @@ public class AuthorController extends HttpServlet {
                     break;
 
                 case ADD_ACTION:
-
                     destination = ADD_PAGE;
                     System.out.println("Statement after add page destinatin set");
-
                     break;
 
                 case AUTHOR_INPUT:
@@ -91,7 +88,6 @@ public class AuthorController extends HttpServlet {
 
                 case UPDATE_ACTION:
                     String authorId = request.getParameter("updateAuthor");
-
                     Author editAuthor = authService.getAuthorById(authorId);
                     request.setAttribute("author", editAuthor);
                     destination = UPDATE_PAGE;
@@ -112,10 +108,9 @@ public class AuthorController extends HttpServlet {
                 case DELETE_ACTION:
                     authService.deleteAuthorById(request.getParameter("deleteAuthor"));
                     this.refreshList(request, authService);
-
                     break;
 
-                case UPDATE_DELETE_ACTION:
+                case UPDATE_DELETE_ADD_ACTION:
                     String subAction = request.getParameter(SUBMIT_ACTION);
 
                     if (subAction.equals(DELETE_ACTION)) {
@@ -124,16 +119,14 @@ public class AuthorController extends HttpServlet {
 
                     } else if (subAction.equals(UPDATE_ACTION)) {
                         String authorId2 = request.getParameter("updateAuthor");
-
                         Author editAuthor2 = authService.getAuthorById(authorId2);
                         request.setAttribute("author", editAuthor2);
                         destination = UPDATE_PAGE;
-
+                    } else if(subAction.equals(ADD_ACTION)){
+                        destination = ADD_PAGE;
                     }
-
                     break;
                 default:
-                    // no param identified in request, must be an error
                     request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
                     destination = LIST_PAGE;
                     break;
@@ -151,7 +144,6 @@ public class AuthorController extends HttpServlet {
             request.setAttribute("errMsg", e.getMessage());
         }
 
-        
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
@@ -168,33 +160,33 @@ public class AuthorController extends HttpServlet {
         DBStrategy db = (DBStrategy) dbClass.newInstance();
         AuthorDaoStrategy authorDao = null;
         Class daoClass = Class.forName(daoClassName);
-        Constructor constructor =  null;
-//          try{
-//         constructor = daoClass.getConstructor(new Class[]{
-//            DBStrategy.class, String.class, String.class, String.class, String.class
-//        });
-//         } catch(NoSuchMethodException nsme){
-//        
-//         }
-//         if (constructor != null) {
-//        Object[] constructorArgs = new Object[]{
-//            db, driverClass, url, userName, password
-//        };
-//        authorDao = (AuthorDaoStrategy) constructor
-//                .newInstance(constructorArgs);
-//
-//          } else {
+        Constructor constructor = null;
+        try {
+            constructor = daoClass.getConstructor(new Class[]{
+                DBStrategy.class, String.class, String.class, String.class, String.class
+            });
+        } catch (NoSuchMethodException nsme) {
+
+        }
+        if (constructor != null) {
+            Object[] constructorArgs = new Object[]{
+                db, driverClass, url, userName, password
+            };
+            authorDao = (AuthorDaoStrategy) constructor
+                    .newInstance(constructorArgs);
+
+        } else {
             Context ctx = new InitialContext();
             DataSource ds = (DataSource) ctx.lookup("jdbc/book2");
             constructor = daoClass.getConstructor(new Class[]{
-                DBStrategy.class, DataSource.class 
+                DBStrategy.class, DataSource.class
             });
             Object[] constructorArgs = new Object[]{
                 db, ds
             };
             authorDao = (AuthorDaoStrategy) constructor
                     .newInstance(constructorArgs);
-//        }
+        }
         return new AuthorService(authorDao);
     }
 

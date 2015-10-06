@@ -20,9 +20,10 @@
     </head>
     <body>
         <h1>Author List</h1>
-        <form  name="updteForm" method="POST" action="AuthorController?action=updateDelete">
+        <form  name="updteForm" method="POST" action="AuthorController?action=updateDeleteAdd">
             <input type="submit" name="submit" value="delete"/>&nbsp
-            <input type="submit" name="submit" value="update"/>
+            <input type="submit" name="submit" value="update"/>&nbsp
+            <input type="submit" name="submit" value="add"/>
             
             <table width="500" border="1" cellspacing="0" cellpadding="4">
                 <tr style="background-color: black;color:white;">
