@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 public class ConnPoolAuthorDao implements AuthorDaoStrategy {
@@ -20,43 +22,74 @@ public class ConnPoolAuthorDao implements AuthorDaoStrategy {
     }
 
     @Override
-    public void deleteAuthorById(String authorId) throws SQLException, ClassNotFoundException {
+    public void deleteAuthorById(String authorId) throws DataAccessException, ClassNotFoundException {
         db.openConnection(ds);
         Integer authorID = Integer.parseInt(authorId);
-        int noOfRecordDeleted = db.deleteRecordById("author", "author_id", authorID);
-        db.closeConnection();
-
+        try {
+            int noOfRecordDeleted = db.deleteRecordById("author", "author_id", authorID);
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        } finally {
+            try {
+                db.closeConnection();
+            } catch (SQLException ex) {
+                throw new DataAccessException(ex.getMessage(), ex);
+            }
+        }
     }
 
     @Override
-    public void addNewAuthor(Author author) throws SQLException, ClassNotFoundException {
+    public void addNewAuthor(Author author) throws DataAccessException, ClassNotFoundException {
+
         db.openConnection(ds);
 
         List<String> recordFields = Arrays.asList("author_name", "date_created");
         List recordValues = Arrays.asList(author.getAuthorName(), author.getDateCreated());
-        int noOfRecordsInserted = db.insertRecord("author", recordFields, recordValues);
-        db.closeConnection();
-        //  return noOfRecordsInserted;
+        try {
+            int noOfRecordsInserted = db.insertRecord("author", recordFields, recordValues);
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        } finally {
+            try {
+                db.closeConnection();
+                //  return noOfRecordsInserted;
+            } catch (SQLException ex) {
+                throw new DataAccessException(ex.getMessage(), ex);
+            }
+        }
     }
 
     @Override
-    public void updateAuthor(Author author) throws SQLException, ClassNotFoundException {
+    public void updateAuthor(Author author) throws DataAccessException, ClassNotFoundException {
         db.openConnection(ds);
 
         List<String> recordFields = Arrays.asList("author_name", "date_created");
         List recordValues = Arrays.asList(author.getAuthorName(), author.getDateCreated());
 
-        int noOfRecordsUpdated = db.updateRecord("author", "author_id", author.getAuthorId(), recordFields, recordValues);
-        db.closeConnection();
-        // return noOfRecordsUpdated;
+        try {
+            int noOfRecordsUpdated = db.updateRecord("author", "author_id", author.getAuthorId(), recordFields, recordValues);
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        } finally {
+            try {
+                db.closeConnection();
+                // return noOfRecordsUpdated;
+            } catch (SQLException ex) {
+                throw new DataAccessException(ex.getMessage(), ex);
+            }
+        }
     }
 
     @Override
-    public Author getAuthorById(String authorId) throws SQLException, ClassNotFoundException {
+    public Author getAuthorById(String authorId) throws DataAccessException, ClassNotFoundException {
         db.openConnection(ds);
 
         Map<String, Object> rawData = new HashMap<>();
-        rawData = db.findRecordByPrimaryKey("Author", "author_id", authorId);
+        try {
+            rawData = db.findRecordByPrimaryKey("Author", "author_id", authorId);
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
         Author author = new Author();
         Object obj = rawData.get("author_id");
         author.setAuthorId(Integer.parseInt(obj.toString()));
@@ -67,18 +100,26 @@ public class ConnPoolAuthorDao implements AuthorDaoStrategy {
         obj = rawData.get("date_created");
         Date dateCreated = (Date) rawData.get("date_created");
         author.setDateCreated(dateCreated);
-        db.closeConnection();
+        try {
+            db.closeConnection();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
 
         return author;
     }
 
     @Override
-    public List<Author> listAllAuthors() throws SQLException, ClassNotFoundException {
+    public List<Author> listAllAuthors() throws DataAccessException, ClassNotFoundException {
         db.openConnection(ds);
         List<Author> authorList = new ArrayList<>();
 
         List<Map<String, Object>> rawData = new ArrayList<>();
-        rawData = db.findAllRecords("author");
+        try {
+            rawData = db.findAllRecords("author");
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
 
         for (Map rawRec : rawData) {
             Author author = new Author();
@@ -95,7 +136,11 @@ public class ConnPoolAuthorDao implements AuthorDaoStrategy {
 
         }
 
-        db.closeConnection();
+        try {
+            db.closeConnection();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
 
         return authorList;
     }

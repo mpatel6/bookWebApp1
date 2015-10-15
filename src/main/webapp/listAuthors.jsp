@@ -21,14 +21,15 @@
     <body>
         <h1>Author List</h1>
         <form  name="updteForm" method="POST" action="AuthorController?action=updateDeleteAdd">
-            <input type="submit" name="submit" value="delete"/>&nbsp
+            <input type="text" name="getHomePage" value="homePage"> 
+            <!--  <input type="submit" name="submit" value="delete"/>&nbsp -->
             <input type="submit" name="submit" value="update"/>&nbsp
             <input type="submit" name="submit" value="add"/>
             
             <table width="500" border="1" cellspacing="0" cellpadding="4">
                 <tr style="background-color: black;color:white;">
-                    <th aligh="left" class="tableHead">Delete</th>
-                    <th aligh="left" class="tableHead">Update</th>
+                    <!--   <th align="left" class="tableHead">Delete</th> -->
+                    <th align="left" class="tableHead">Update</th>
                     <th align="left" class="tableHead">ID</th>
                     <th align="left" class="tableHead">Author Name</th>
                     <th align="right" class="tableHead">Date Added</th>
@@ -42,9 +43,9 @@
                             <tr style="background-color: #ccffff;">
                             </c:otherwise>
                         </c:choose>
-                        <td><input type="checkbox" name="deleteAuthor" value="${a.authorId}"> </td>     
+                       <!-- <td><input type="checkbox" name="deleteAuthor" value="${a.authorId}"> </td>   -->  
                         <td><input type="checkbox" name="updateAuthor" value="${a.authorId}"> </td>       
-                        <td align="left">${a.authorId}</td>
+                        <td align="left"><a href="AuthorController?action=delete&deleteAuthor=${a.authorId}">${a.authorId}</a></td>
                         <td align="left">${a.authorName}</td>
                         <td align="right">
                             <fmt:formatDate pattern="M/d/yyyy" value="${a.dateCreated}"></fmt:formatDate>

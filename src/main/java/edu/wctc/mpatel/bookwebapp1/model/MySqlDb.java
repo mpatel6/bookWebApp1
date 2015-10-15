@@ -2,6 +2,7 @@ package edu.wctc.mpatel.bookwebapp1.model;
 
 import java.sql.*;
 import java.util.*;
+
 import javax.sql.DataSource;
 
 public class MySqlDb implements DBStrategy {
@@ -9,12 +10,16 @@ public class MySqlDb implements DBStrategy {
     private Connection conn;
 
     @Override
-    public void openConnection(String driverClass, String url, String userName, String password) throws SQLException, ClassNotFoundException {
-        //class not found exception
-        Class.forName(driverClass);
-
-        //SQL Exception
-        conn = DriverManager.getConnection(url, userName, password);
+    public void openConnection(String driverClass, String url, String userName, String password) throws DataAccessException {
+        try {
+            //class not found exception
+            Class.forName(driverClass);
+            
+            //SQL Exception
+            conn = DriverManager.getConnection(url, userName, password);
+        } catch (ClassNotFoundException | SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
     }
 
     @Override
@@ -24,8 +29,16 @@ public class MySqlDb implements DBStrategy {
     }
     
     @Override
-     public final void openConnection(DataSource ds) throws SQLException {
-        conn = ds.getConnection();
+     public final void openConnection(DataSource ds) throws DataAccessException {
+         
+         
+        try {
+            conn = ds.getConnection();
+        } 
+        
+        catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
     }
 
     @Override
@@ -169,31 +182,31 @@ public class MySqlDb implements DBStrategy {
         MySqlDb db = new MySqlDb();
 
         db.openConnection("com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/book2",
+                "jdbc:mysql://localhost:3306/sunav_valve_db",
                 "root",
                 "admin");
 
-        List<Object> recordValues = new ArrayList<>();
-        recordValues.add("David Samson1");
-        recordValues.add("2015-05-06");
-
-        List<String> recordFields = new ArrayList<>();
-        recordFields.add("author_name");
-        recordFields.add("date_created");
+//        List<Object> recordValues = new ArrayList<>();
+//        recordValues.add("David Samson1");
+//        recordValues.add("2015-05-06");
+//
+//        List<String> recordFields = new ArrayList<>();
+//        recordFields.add("author_name");
+//        recordFields.add("date_created");
 //        int updateQueryInt = db.insertRecord("author", recordFields, recordValues);
 //        System.out.println("Number of Records Created=" + updateQueryInt);
 
-        int udateRecordInt = db.updateRecord("author", "author_id", "12", recordFields, recordValues);
-        System.out.println("Number of Records updated=" + udateRecordInt);
+//        int udateRecordInt = db.updateRecord("author", "author_id", "12", recordFields, recordValues);
+//        System.out.println("Number of Records updated=" + udateRecordInt);
 
-        List<Map<String, Object>> records = db.findAllRecords("author");
+        List<Map<String, Object>> records = db.findAllRecords("product");
         for (Map record : records) {
             System.out.println(record);
         }
 
-        Map<String, Object> mapRec = db.findRecordByPrimaryKey("author", "author_id", "2");
-
-        System.out.println(mapRec);
+//        Map<String, Object> mapRec = db.findRecordByPrimaryKey("author", "author_id", "2");
+//
+//        System.out.println(mapRec);
 
         db.closeConnection();
     }

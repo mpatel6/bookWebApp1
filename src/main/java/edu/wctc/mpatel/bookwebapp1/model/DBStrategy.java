@@ -9,7 +9,7 @@ public interface DBStrategy {
 
     public void closeConnection() throws SQLException;
     
-    public  void openConnection(DataSource ds) throws SQLException;
+    public  void openConnection(DataSource ds) throws  DataAccessException;
 
     public int deleteRecordById(String tableName, String recordField, Object recordValue) throws SQLException;
 
@@ -17,7 +17,7 @@ public interface DBStrategy {
 
     public int insertRecord(String tableName, List<String> recordFields, List<Object> recordValues) throws SQLException;
 
-    public void openConnection(String driverClass, String url, String userName, String password) throws SQLException, ClassNotFoundException;
+    public void openConnection(String driverClass, String url, String userName, String password) throws DataAccessException;
 
     public int updateRecord(String tableName, String recordWhereField, Object recordWhereValue, List<String> recordFields, List<Object> recordValues) throws SQLException;
 

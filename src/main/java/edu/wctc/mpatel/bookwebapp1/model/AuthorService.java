@@ -13,23 +13,23 @@ public class AuthorService {
         this.dao = dao;
     }
 
-    public List<Author> listAllAuthors() throws SQLException, ClassNotFoundException {
+    public List<Author> listAllAuthors() throws DataAccessException, ClassNotFoundException {
         return dao.listAllAuthors();
     }
 
-     public Author getAuthorById(String authorId) throws SQLException, ClassNotFoundException {
+     public Author getAuthorById(String authorId) throws DataAccessException, ClassNotFoundException {
         return dao.getAuthorById(authorId);
     }
      
-    public void deleteAuthorById(String recordValue) throws SQLException, ClassNotFoundException {
+    public void deleteAuthorById(String recordValue) throws DataAccessException, ClassNotFoundException {
         dao.deleteAuthorById(recordValue);
     }
 
-    public void addNewAuthor(Author author) throws SQLException, ClassNotFoundException {
+    public void addNewAuthor(Author author) throws DataAccessException, ClassNotFoundException {
         dao.addNewAuthor(author);
     }
 
-    public void updateAuthor(Author author) throws SQLException, ClassNotFoundException {
+    public void updateAuthor(Author author) throws DataAccessException, ClassNotFoundException {
         dao.updateAuthor(author);
     }
 

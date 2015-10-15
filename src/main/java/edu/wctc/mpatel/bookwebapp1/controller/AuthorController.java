@@ -4,6 +4,7 @@ import edu.wctc.mpatel.bookwebapp1.model.Author;
 import edu.wctc.mpatel.bookwebapp1.model.AuthorDaoStrategy;
 import edu.wctc.mpatel.bookwebapp1.model.AuthorService;
 import edu.wctc.mpatel.bookwebapp1.model.DBStrategy;
+import edu.wctc.mpatel.bookwebapp1.model.DataAccessException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -36,6 +37,7 @@ public class AuthorController extends HttpServlet {
     private static final String SUBMIT_ACTION = "submit";
     private static final String AUTHOR_INPUT = "inputData";
     private static final String UPDATE_INPUT = "editData";
+    private static final String HOME_PAGE="homePage";
 
     private String driverClass;
     private String url;
@@ -126,6 +128,11 @@ public class AuthorController extends HttpServlet {
                         destination = ADD_PAGE;
                     }
                     break;
+                    
+                case HOME_PAGE:                    
+                    response.sendRedirect("index.html");
+                    break;
+                    
                 default:
                     request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
                     destination = LIST_PAGE;
@@ -134,7 +141,7 @@ public class AuthorController extends HttpServlet {
 
         } catch (IllegalArgumentException iae) {
             request.setAttribute("errMsg", iae.getMessage());
-        } catch (SQLException e) {
+        } catch (DataAccessException e) {
             request.setAttribute("errMsg", e.getCause().getMessage());
         } catch (ClassNotFoundException cnfe) {
             request.setAttribute("errMsg", cnfe.getCause().getMessage());
@@ -149,7 +156,7 @@ public class AuthorController extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    private void refreshList(HttpServletRequest request, AuthorService authService) throws SQLException, ClassNotFoundException {
+    private void refreshList(HttpServletRequest request, AuthorService authService) throws DataAccessException, ClassNotFoundException {
         List<Author> authors = authService.listAllAuthors();
         request.setAttribute("authors", authors);
     }
@@ -177,7 +184,7 @@ public class AuthorController extends HttpServlet {
 
         } else {
             Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup("jdbc/book2");
+            DataSource ds = (DataSource) ctx.lookup(databaseName);
             constructor = daoClass.getConstructor(new Class[]{
                 DBStrategy.class, DataSource.class
             });

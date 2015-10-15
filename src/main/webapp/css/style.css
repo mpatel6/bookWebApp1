@@ -30,6 +30,7 @@ p.classLeft{
 
 body{
     background-color: gray;
+    font-family: serif, "Times New Roman", Times, serif;
     
     /*
     background-image: url("gradient_bg.png");
