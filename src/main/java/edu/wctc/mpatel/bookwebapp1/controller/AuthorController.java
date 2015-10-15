@@ -1,10 +1,11 @@
 package edu.wctc.mpatel.bookwebapp1.controller;
 
-import edu.wctc.mpatel.bookwebapp1.model.Author;
-import edu.wctc.mpatel.bookwebapp1.model.AuthorDaoStrategy;
-import edu.wctc.mpatel.bookwebapp1.model.AuthorService;
-import edu.wctc.mpatel.bookwebapp1.model.DBStrategy;
-import edu.wctc.mpatel.bookwebapp1.model.DataAccessException;
+import edu.wctc.mpatel.bookwebapp1.entity.Author;
+//import edu.wctc.mpatel.bookwebapp1.model.AuthorDaoStrategy;
+//import edu.wctc.mpatel.bookwebapp1.model.AuthorService;
+//import edu.wctc.mpatel.bookwebapp1.model.DBStrategy;
+//import edu.wctc.mpatel.bookwebapp1.model.DataAccessException;
+import edu.wctc.mpatel.bookwebapp1.service.AuthorFacade;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -13,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
@@ -38,16 +40,19 @@ public class AuthorController extends HttpServlet {
     private static final String AUTHOR_INPUT = "inputData";
     private static final String UPDATE_INPUT = "editData";
     private static final String HOME_PAGE="homePage";
+    
+    @Inject
+    private AuthorFacade authService;
 
-    private String driverClass;
-    private String url;
-    private String userName;
-    private String password;
-    private String dbStrategyClassName;
-    private String daoClassName;
-    private DBStrategy db;
-    private AuthorDaoStrategy authorDao;
-    private String databaseName;
+//    private String driverClass;
+//    private String url;
+//    private String userName;
+//    private String password;
+//    private String dbStrategyClassName;
+//    private String daoClassName;
+//    private DBStrategy db;
+//    private AuthorDaoStrategy authorDao;
+//    private String databaseName;
 
     /**
      *
@@ -64,7 +69,7 @@ public class AuthorController extends HttpServlet {
 
         try {
 
-            AuthorService authService = injectDependenciesAndGetAuthorService();
+//            AuthorService authService = injectDependenciesAndGetAuthorService();
 
             switch (action) {
                 case LIST_ACTION:
@@ -74,23 +79,24 @@ public class AuthorController extends HttpServlet {
 
                 case ADD_ACTION:
                     destination = ADD_PAGE;
-                    System.out.println("Statement after add page destinatin set");
                     break;
 
                 case AUTHOR_INPUT:
                     String authorName = request.getParameter("authorName");
                     String dateCreated = request.getParameter("dateCreated");
                     DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date = format.parse(dateCreated);
-                    Author author = new Author(authorName, date);
-                    authService.addNewAuthor(author);
+                    Date date = format.parse(dateCreated);                    
+                    Author author = new Author(0);
+                    author.setAuthorName(authorName);
+                    author.setDateCreated(date);
+                    authService.edit(author);
                     this.refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
 
                 case UPDATE_ACTION:
                     String authorId = request.getParameter("updateAuthor");
-                    Author editAuthor = authService.getAuthorById(authorId);
+                    Author editAuthor = authService.find(new Integer(authorId));
                     request.setAttribute("author", editAuthor);
                     destination = UPDATE_PAGE;
                     break;
@@ -99,16 +105,23 @@ public class AuthorController extends HttpServlet {
 
                     String authorId1 = request.getParameter("authorId");
                     String authorName1 = request.getParameter("authorName");
-                    String dateCreated1 = request.getParameter("dateCreated");
+                    String dateCreated1 = request.getParameter("dateCreated");                    
                     DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date1 = format1.parse(dateCreated1);
-                    Author author1 = new Author(Integer.parseInt(authorId1), authorName1, date1);
-                    authService.updateAuthor(author1);
+                    Date date1 = format1.parse(dateCreated1);                   
+                    Author author1 = authService.find(new Integer(authorId1));
+
+                    author1.setAuthorName(authorName1);
+                    author1.setDateCreated(date1);
+                    authService.edit(author1);
                     this.refreshList(request, authService);
                     destination = LIST_PAGE;
 
                 case DELETE_ACTION:
-                    authService.deleteAuthorById(request.getParameter("deleteAuthor"));
+                    
+//                    authService.deleteAuthorById(request.getParameter("deleteAuthor"));
+                    String authorIdToDel = request.getParameter("deleteAuthor");
+                    Author authorToDel =authService.find(new Integer(authorIdToDel));
+                        authService.remove(authorToDel);
                     this.refreshList(request, authService);
                     break;
 
@@ -116,12 +129,17 @@ public class AuthorController extends HttpServlet {
                     String subAction = request.getParameter(SUBMIT_ACTION);
 
                     if (subAction.equals(DELETE_ACTION)) {
-                        authService.deleteAuthorById(request.getParameter("deleteAuthor"));
+                        String authorIdToDel1 = request.getParameter("deleteAuthor");
+                        Author authorDel =authService.find(new Integer(authorIdToDel1));
+                        authService.remove(authorDel);
+                     //   authService.re(request.getParameter("deleteAuthor"));
                         this.refreshList(request, authService);
 
                     } else if (subAction.equals(UPDATE_ACTION)) {
                         String authorId2 = request.getParameter("updateAuthor");
-                        Author editAuthor2 = authService.getAuthorById(authorId2);
+                        
+                       Author editAuthor2 = authService.find(new Integer(authorId2));                     
+                        
                         request.setAttribute("author", editAuthor2);
                         destination = UPDATE_PAGE;
                     } else if(subAction.equals(ADD_ACTION)){
@@ -141,8 +159,6 @@ public class AuthorController extends HttpServlet {
 
         } catch (IllegalArgumentException iae) {
             request.setAttribute("errMsg", iae.getMessage());
-        } catch (DataAccessException e) {
-            request.setAttribute("errMsg", e.getCause().getMessage());
         } catch (ClassNotFoundException cnfe) {
             request.setAttribute("errMsg", cnfe.getCause().getMessage());
         } catch (ParseException pe) {
@@ -156,57 +172,57 @@ public class AuthorController extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    private void refreshList(HttpServletRequest request, AuthorService authService) throws DataAccessException, ClassNotFoundException {
-        List<Author> authors = authService.listAllAuthors();
+    private void refreshList(HttpServletRequest request, AuthorFacade authService) throws ClassNotFoundException {
+        List<Author> authors = authService.findAll();
         request.setAttribute("authors", authors);
     }
 
-    private AuthorService injectDependenciesAndGetAuthorService() throws Exception {
-
-        Class dbClass = Class.forName(dbStrategyClassName);
-        DBStrategy db = (DBStrategy) dbClass.newInstance();
-        AuthorDaoStrategy authorDao = null;
-        Class daoClass = Class.forName(daoClassName);
-        Constructor constructor = null;
-        try {
-            constructor = daoClass.getConstructor(new Class[]{
-                DBStrategy.class, String.class, String.class, String.class, String.class
-            });
-        } catch (NoSuchMethodException nsme) {
-
-        }
-        if (constructor != null) {
-            Object[] constructorArgs = new Object[]{
-                db, driverClass, url, userName, password
-            };
-            authorDao = (AuthorDaoStrategy) constructor
-                    .newInstance(constructorArgs);
-
-        } else {
-            Context ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(databaseName);
-            constructor = daoClass.getConstructor(new Class[]{
-                DBStrategy.class, DataSource.class
-            });
-            Object[] constructorArgs = new Object[]{
-                db, ds
-            };
-            authorDao = (AuthorDaoStrategy) constructor
-                    .newInstance(constructorArgs);
-        }
-        return new AuthorService(authorDao);
-    }
+//    private AuthorService injectDependenciesAndGetAuthorService() throws Exception {
+//
+//        Class dbClass = Class.forName(dbStrategyClassName);
+//        DBStrategy db = (DBStrategy) dbClass.newInstance();
+//        AuthorDaoStrategy authorDao = null;
+//        Class daoClass = Class.forName(daoClassName);
+//        Constructor constructor = null;
+//        try {
+//            constructor = daoClass.getConstructor(new Class[]{
+//                DBStrategy.class, String.class, String.class, String.class, String.class
+//            });
+//        } catch (NoSuchMethodException nsme) {
+//
+//        }
+//        if (constructor != null) {
+//            Object[] constructorArgs = new Object[]{
+//                db, driverClass, url, userName, password
+//            };
+//            authorDao = (AuthorDaoStrategy) constructor
+//                    .newInstance(constructorArgs);
+//
+//        } else {
+//            Context ctx = new InitialContext();
+//            DataSource ds = (DataSource) ctx.lookup(databaseName);
+//            constructor = daoClass.getConstructor(new Class[]{
+//                DBStrategy.class, DataSource.class
+//            });
+//            Object[] constructorArgs = new Object[]{
+//                db, ds
+//            };
+//            authorDao = (AuthorDaoStrategy) constructor
+//                    .newInstance(constructorArgs);
+//        }
+//        return new AuthorService(authorDao);
+//    }
 
     @Override
     public void init() throws ServletException {
 
-        driverClass = getServletContext().getInitParameter("driverClass");
-        url = getServletContext().getInitParameter("url");
-        userName = getServletContext().getInitParameter("userName");
-        password = getServletContext().getInitParameter("password");
-        dbStrategyClassName = this.getServletContext().getInitParameter("dbStrategy");
-        daoClassName = this.getServletContext().getInitParameter("authorDao");
-        databaseName = getServletContext().getInitParameter("databaseName");
+//        driverClass = getServletContext().getInitParameter("driverClass");
+//        url = getServletContext().getInitParameter("url");
+//        userName = getServletContext().getInitParameter("userName");
+//        password = getServletContext().getInitParameter("password");
+//        dbStrategyClassName = this.getServletContext().getInitParameter("dbStrategy");
+//        daoClassName = this.getServletContext().getInitParameter("authorDao");
+//        databaseName = getServletContext().getInitParameter("databaseName");
 
     }
 

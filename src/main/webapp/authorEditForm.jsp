@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>       
 <!DOCTYPE html>
 <html>
     <head>
@@ -15,9 +16,10 @@
         
         <form id="authorEditData" name="authorEditData" method="POST" action="AuthorController?action=editData">
         <h1>Author Edit Page</h1>
-         <input type="text" id="authorId" name="authorId" value="${author.getAuthorId()}">
+         <input type="text" id="authorId" name="authorId" value="${author.getAuthorId()}" readonly>
         <input type="text" id="authorName" name="authorName" value="${author.getAuthorName()}">
-        <input type="text" id="dateCreated" name="dateCreated" value="${author.dateCreated}">
+        <input type="text" id="dateCreated" name="dateCreated" value="<fmt:formatDate pattern="yyyy-MM-dd" value="${author.dateCreated}"></fmt:formatDate>">
+        
         <input type="submit" id="authorInputSubmit" name="submit" value="Submit"   >
         </form>
     </body>
