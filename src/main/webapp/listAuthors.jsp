@@ -20,11 +20,11 @@
     </head>
     <body>
         <h1>Author List</h1>
-        <form  name="updteForm" method="POST" action="AuthorController?action=updateDeleteAdd">
-            <input type="text" name="getHomePage" value="homePage"> 
-            <!--  <input type="submit" name="submit" value="delete"/>&nbsp -->
-            <input type="submit" name="submit" value="update"/>&nbsp
-            <input type="submit" name="submit" value="add"/>
+        <form  name="listForm" method="POST" action="AuthorController">
+            <input type="submit" name="action" value="homePage"/> 
+            <input type="submit" name="action" value="update"/>&nbsp
+            <input type="submit" name="action" value="add"/>
+      <!--  <input type="submit" name="submit" value="delete"/>&nbsp -->
             
             <table width="500" border="1" cellspacing="0" cellpadding="4">
                 <tr style="background-color: black;color:white;">
@@ -44,7 +44,7 @@
                             </c:otherwise>
                         </c:choose>
                        <!-- <td><input type="checkbox" name="deleteAuthor" value="${a.authorId}"> </td>   -->  
-                        <td><input type="checkbox" name="updateAuthor" value="${a.authorId}"> </td>       
+                        <td><input type="checkbox" name="authorId" value="${a.authorId}"> </td>       
                         <td align="left"><a href="AuthorController?action=delete&deleteAuthor=${a.authorId}">${a.authorId}</a></td>
                         <td align="left">${a.authorName}</td>
                         <td align="right">

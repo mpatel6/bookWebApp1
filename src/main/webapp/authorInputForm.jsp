@@ -12,12 +12,21 @@
         <title>Author Input Form</title>
     </head>
     <body>
-        
-        <form id="authorData" name="authorData" method="POST" action="AuthorController?action=inputData">
-        <h1>Author Information Input Page</h1>
-        <input type="text" id="authorName" name="authorName" placeholder="Enter Author Name" >
-        <input type="text" id="dateCreated" name="dateCreated" placeholder="Enter Date Created YYYY-MM-DD" >
-        <input type="submit" id="authorInputSubmit" name="submit" value="Submit"   >
+
+        <form id="authorData" name="authorData" method="POST" action="AuthorController">
+            <h1>Author Information Input Page</h1>
+            <input type="text" id="authorName" name="authorName" placeholder="Author Name" >
+            <input type="text" id="dateCreated" name="dateCreated" placeholder="YYYY-MM-DD" >
+            <input type="submit" id="addAuthorSubmit" name="action" value="add"   >
+             <input type="submit" id="listPage" name="action" value="list"   >
+            <br>
+            <br>
+            <br>
+
+            <h1>Book Information Input For Above Author</h1>
+            <input type="text" id="bookTitle" name="bookTitle" placeholder="Book Title" >
+            <input type="text" id="isbn" name="isbn" placeholder="isbn" >
+
         </form>
     </body>
 </html>

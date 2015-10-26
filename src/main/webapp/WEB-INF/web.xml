@@ -36,9 +36,17 @@
         <servlet-name>AuthorController</servlet-name>
         <servlet-class>edu.wctc.mpatel.bookwebapp1.controller.AuthorController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>BookController</servlet-name>
+        <servlet-class>edu.wctc.mpatel.bookwebapp1.controller.BookController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AuthorController</servlet-name>
         <url-pattern>/AuthorController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookController</servlet-name>
+        <url-pattern>/BookController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

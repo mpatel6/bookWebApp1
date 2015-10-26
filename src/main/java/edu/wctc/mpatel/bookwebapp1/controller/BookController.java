@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package edu.wctc.mpatel.bookwebapp1.controller;
 
 import edu.wctc.mpatel.bookwebapp1.entity.Author;
@@ -5,31 +10,25 @@ import edu.wctc.mpatel.bookwebapp1.entity.Book;
 import edu.wctc.mpatel.bookwebapp1.service.AuthorFacade;
 import edu.wctc.mpatel.bookwebapp1.service.BookFacade;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.sql.SQLException;
-import java.text.DateFormat;
+import java.io.PrintWriter;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
-public class AuthorController extends HttpServlet {
+/**
+ *
+ * @author Ankita
+ */
+public class BookController extends HttpServlet {
 
-    private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
-    private static final String LIST_PAGE = "/listAuthors.jsp";
-    private static final String ADD_PAGE = "/authorInputForm.jsp";
-    private static final String UPDATE_PAGE = "/authorEditForm.jsp";
+    private static final String LIST_PAGE = "/listBooks.jsp";
+    private static final String ADD_PAGE = "/addBook.jsp";
+    private static final String UPDATE_PAGE = "/updateBook.jsp";
     private static final String HOME_PAGE = "/index.html";
 
     private static final String ACTION_PARAM = "action";
@@ -38,138 +37,112 @@ public class AuthorController extends HttpServlet {
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String HOME_PAGE_ACTION = "homePage";
-    private static final String ADD_BOOK_TO_AUTHOR = "addBookToAuthor";
+//    private static final String ADD_BOOK_TO_AUTHOR = "addBookToAuthor";
+
+    @Inject
+    private BookFacade bookService;
 
     @Inject
     private AuthorFacade authService;
 
     /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
      *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
+        Book book = null;
 
         try {
-            Author author;
-            Set<Book> books = new HashSet<>();
-            Book book;
-            String authorId = request.getParameter("authorId");
-            String authorName = request.getParameter("authorName");
-            String dateCreated = request.getParameter("dateCreated");
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            
-            
-            String bookId = request.getParameter("bookId");
-            String bookTitle = request.getParameter("bookTitle");
+
+            String title = request.getParameter("title");
             String isbn = request.getParameter("isbn");
-            
-            Date date;
-            //format.parse(dateCreated);                    
+            String authorId = request.getParameter("authorId");
+            String bookId = request.getParameter("bookId");
 
             switch (action) {
                 case LIST_ACTION:
+                    this.refreshBookList(request, bookService);
                     this.refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
-
-                case ADD_ACTION:
-                    if (authorName == null) {
-                        destination = ADD_PAGE;
-                    } else {
-                        author = new Author(0);
-                        author.setAuthorName(authorName);
-                        author.setDateCreated(format.parse(dateCreated));
-                        
-                        
-                        book = new Book(0);
-                        book.setTitle(bookTitle);
-                        book.setIsbn(isbn);
-                        book.setAuthorId(author);
-                        books.add(book);
-                        author.setBookSet(books);     
-                        
-                        authService.edit(author);
-                        this.refreshList(request, authService);
-                        destination = LIST_PAGE;
-                    }
-                    break;
-                    
-                 case ADD_BOOK_TO_AUTHOR:
-                    if (bookTitle == null || isbn==null) {
-                        author = authService.find(new Integer(authorId));
-                        request.setAttribute("author", author);
-                        destination = UPDATE_PAGE;
-                    } else {
-//                      if (authorName == null) {
-//                        author = authService.find(new Integer(authorId));
-//                        request.setAttribute("author", author);
-//                        destination = UPDATE_PAGE;
-//                    } else {
-                        author = authService.find(new Integer(authorId));
-                        author.setAuthorName(authorName);
-                        author.setDateCreated(format.parse(dateCreated));
-                        book = new Book(0);
-                        book.setTitle(bookTitle);
-                        book.setIsbn(isbn);
-                        book.setAuthorId(author);
-                        books.add(book);
-                        author.setBookSet(books);  
-                        authService.edit(author);
-                        this.refreshList(request, authService);
-                        destination = UPDATE_PAGE;
-                    }
-                    break;
-
-                case UPDATE_ACTION:
-
-                    if (authorName == null) {
-                        author = authService.find(new Integer(authorId));
-                        request.setAttribute("author", author);
-                        destination = UPDATE_PAGE;
-                    } else {
-                        author = authService.find(new Integer(authorId));
-                        author.setAuthorName(authorName);
-                        author.setDateCreated(format.parse(dateCreated));
-                        authService.edit(author);
-                        this.refreshList(request, authService);
-                        destination = LIST_PAGE;
-                    }
-                    break;
-                
-               
-
-                case DELETE_ACTION:
-
-                    String authorIdToDel = request.getParameter("deleteAuthor");
-                    Author authorToDel = authService.find(new Integer(authorIdToDel));
-                    authService.remove(authorToDel);
-                    this.refreshList(request, authService);
-                    break;
-
                 case HOME_PAGE_ACTION:
-                    //response.sendRedirect("index.html");
                     destination = HOME_PAGE;
                     break;
 
+                case ADD_ACTION:
+                    if (title == null) {
+                        destination = ADD_PAGE;
+                        this.refreshBookList(request, bookService);
+                        this.refreshList(request, authService);
+                    } else {
+
+                        book = new Book(0);
+                        book.setTitle(title);
+                        book.setIsbn(isbn);
+                        Author author = null;
+                        if (authorId != null) {
+                            author = authService.find(new Integer(authorId));
+                            book.setAuthorId(author);
+                        }
+                        bookService.edit(book);
+                        this.refreshBookList(request, bookService);
+                        this.refreshList(request, authService);
+                        destination = LIST_PAGE;
+                    }
+                    break;
+                case UPDATE_ACTION:
+                    if (title == null) {
+                        book = bookService.find(new Integer(bookId));
+                        request.setAttribute("book", book);
+                        destination = UPDATE_PAGE;
+                        this.refreshBookList(request, bookService);
+                        this.refreshList(request, authService);
+
+                    } else {
+                        book = bookService.find(new Integer(bookId));
+                        book.setTitle(title);
+                        book.setIsbn(isbn);
+                        Author author = null;
+                        if (authorId != null) {
+                            author = authService.find(new Integer(authorId));
+                            book.setAuthorId(author);
+                        }
+                        bookService.edit(book);
+                        this.refreshBookList(request, bookService);
+                        this.refreshList(request, authService);
+                        destination = LIST_PAGE;
+                    }
+                    break;
+
+                case DELETE_ACTION:
+                    String bookIdToDel = request.getParameter("deleteBook");
+                    Book bookToDel = bookService.find(new Integer(bookIdToDel));
+                    bookService.remove(bookToDel);
+                    this.refreshBookList(request, bookService);
+                    this.refreshList(request, authService);
+                    break;
+
                 default:
-                    request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
+                    this.refreshBookList(request, bookService);
+                    this.refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
-            }
 
+            }
         } catch (IllegalArgumentException iae) {
             request.setAttribute("errMsg", iae.getMessage());
         } catch (ClassNotFoundException cnfe) {
             request.setAttribute("errMsg", cnfe.getCause().getMessage());
-        } catch (ParseException pe) {
-            request.setAttribute("errMsg", pe.getMessage());
         } catch (Exception e) {
             request.setAttribute("errMsg", e.getMessage());
         }
@@ -177,16 +150,17 @@ public class AuthorController extends HttpServlet {
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
+
+    }
+
+    private void refreshBookList(HttpServletRequest request, BookFacade bookService) throws ClassNotFoundException {
+        List<Book> books = bookService.findAll();
+        request.setAttribute("books", books);
     }
 
     private void refreshList(HttpServletRequest request, AuthorFacade authService) throws ClassNotFoundException {
         List<Author> authors = authService.findAll();
         request.setAttribute("authors", authors);
-    }
-
-    @Override
-    public void init() throws ServletException {
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
