@@ -7,18 +7,21 @@ package edu.wctc.mpatel.bookwebapp1.controller;
 
 import edu.wctc.mpatel.bookwebapp1.entity.Author;
 import edu.wctc.mpatel.bookwebapp1.entity.Book;
-import edu.wctc.mpatel.bookwebapp1.service.AuthorFacade;
-import edu.wctc.mpatel.bookwebapp1.service.BookFacade;
+import edu.wctc.mpatel.bookwebapp1.service.AuthorService;
+import edu.wctc.mpatel.bookwebapp1.service.BookService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -39,11 +42,7 @@ public class BookController extends HttpServlet {
     private static final String HOME_PAGE_ACTION = "homePage";
 //    private static final String ADD_BOOK_TO_AUTHOR = "addBookToAuthor";
 
-    @Inject
-    private BookFacade bookService;
-
-    @Inject
-    private AuthorFacade authService;
+  
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -61,6 +60,12 @@ public class BookController extends HttpServlet {
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
         Book book = null;
+        
+         ServletContext sctx = getServletContext();
+        WebApplicationContext ctx
+                = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        BookService bookService = (BookService) ctx.getBean("bookService");
+        AuthorService authService = (AuthorService) ctx.getBean("authorService");
 
         try {
 
@@ -91,7 +96,7 @@ public class BookController extends HttpServlet {
                         book.setIsbn(isbn);
                         Author author = null;
                         if (authorId != null) {
-                            author = authService.find(new Integer(authorId));
+                            author = authService.findById(authorId);
                             book.setAuthorId(author);
                         }
                         bookService.edit(book);
@@ -102,19 +107,19 @@ public class BookController extends HttpServlet {
                     break;
                 case UPDATE_ACTION:
                     if (title == null) {
-                        book = bookService.find(new Integer(bookId));
+                        book = bookService.findById(bookId);
                         request.setAttribute("book", book);
                         destination = UPDATE_PAGE;
                         this.refreshBookList(request, bookService);
                         this.refreshList(request, authService);
 
                     } else {
-                        book = bookService.find(new Integer(bookId));
+                        book = bookService.findById(bookId);
                         book.setTitle(title);
                         book.setIsbn(isbn);
                         Author author = null;
                         if (authorId != null) {
-                            author = authService.find(new Integer(authorId));
+                            author = authService.findById(authorId);
                             book.setAuthorId(author);
                         }
                         bookService.edit(book);
@@ -126,7 +131,7 @@ public class BookController extends HttpServlet {
 
                 case DELETE_ACTION:
                     String bookIdToDel = request.getParameter("deleteBook");
-                    Book bookToDel = bookService.find(new Integer(bookIdToDel));
+                    Book bookToDel = bookService.findById(bookIdToDel);
                     bookService.remove(bookToDel);
                     this.refreshBookList(request, bookService);
                     this.refreshList(request, authService);
@@ -153,12 +158,12 @@ public class BookController extends HttpServlet {
 
     }
 
-    private void refreshBookList(HttpServletRequest request, BookFacade bookService) throws ClassNotFoundException {
+    private void refreshBookList(HttpServletRequest request, BookService bookService) throws ClassNotFoundException {
         List<Book> books = bookService.findAll();
         request.setAttribute("books", books);
     }
 
-    private void refreshList(HttpServletRequest request, AuthorFacade authService) throws ClassNotFoundException {
+    private void refreshList(HttpServletRequest request, AuthorService authService) throws ClassNotFoundException {
         List<Author> authors = authService.findAll();
         request.setAttribute("authors", authors);
     }

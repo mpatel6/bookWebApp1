@@ -2,8 +2,7 @@ package edu.wctc.mpatel.bookwebapp1.controller;
 
 import edu.wctc.mpatel.bookwebapp1.entity.Author;
 import edu.wctc.mpatel.bookwebapp1.entity.Book;
-import edu.wctc.mpatel.bookwebapp1.service.AuthorFacade;
-import edu.wctc.mpatel.bookwebapp1.service.BookFacade;
+import edu.wctc.mpatel.bookwebapp1.service.AuthorService;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -18,11 +17,14 @@ import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class AuthorController extends HttpServlet {
 
@@ -40,8 +42,7 @@ public class AuthorController extends HttpServlet {
     private static final String HOME_PAGE_ACTION = "homePage";
     private static final String ADD_BOOK_TO_AUTHOR = "addBookToAuthor";
 
-    @Inject
-    private AuthorFacade authService;
+  
 
     /**
      *
@@ -55,6 +56,11 @@ public class AuthorController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
+        
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx
+                = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        AuthorService authService = (AuthorService) ctx.getBean("authorService");
 
         try {
             Author author;
@@ -103,7 +109,7 @@ public class AuthorController extends HttpServlet {
                     
                  case ADD_BOOK_TO_AUTHOR:
                     if (bookTitle == null || isbn==null) {
-                        author = authService.find(new Integer(authorId));
+                        author = authService.findByIdAndFetchBooksEagerly(authorId);
                         request.setAttribute("author", author);
                         destination = UPDATE_PAGE;
                     } else {
@@ -112,7 +118,7 @@ public class AuthorController extends HttpServlet {
 //                        request.setAttribute("author", author);
 //                        destination = UPDATE_PAGE;
 //                    } else {
-                        author = authService.find(new Integer(authorId));
+                        author = authService.findByIdAndFetchBooksEagerly(authorId);
                         author.setAuthorName(authorName);
                         author.setDateCreated(format.parse(dateCreated));
                         book = new Book(0);
@@ -130,11 +136,11 @@ public class AuthorController extends HttpServlet {
                 case UPDATE_ACTION:
 
                     if (authorName == null) {
-                        author = authService.find(new Integer(authorId));
+                        author = authService.findByIdAndFetchBooksEagerly(authorId);
                         request.setAttribute("author", author);
                         destination = UPDATE_PAGE;
                     } else {
-                        author = authService.find(new Integer(authorId));
+                        author = authService.findByIdAndFetchBooksEagerly(authorId);
                         author.setAuthorName(authorName);
                         author.setDateCreated(format.parse(dateCreated));
                         authService.edit(author);
@@ -148,7 +154,7 @@ public class AuthorController extends HttpServlet {
                 case DELETE_ACTION:
 
                     String authorIdToDel = request.getParameter("deleteAuthor");
-                    Author authorToDel = authService.find(new Integer(authorIdToDel));
+                    Author authorToDel = authService.findByIdAndFetchBooksEagerly(authorIdToDel);
                     authService.remove(authorToDel);
                     this.refreshList(request, authService);
                     break;
@@ -179,7 +185,7 @@ public class AuthorController extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    private void refreshList(HttpServletRequest request, AuthorFacade authService) throws ClassNotFoundException {
+    private void refreshList(HttpServletRequest request, AuthorService authService) throws ClassNotFoundException {
         List<Author> authors = authService.findAll();
         request.setAttribute("authors", authors);
     }

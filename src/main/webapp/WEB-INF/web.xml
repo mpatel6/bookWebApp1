@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <context-param>
+  <!--  <context-param>
         <param-name>dbStrategy</param-name>
         <param-value>edu.wctc.mpatel.bookwebapp1.model.MySqlDb</param-value>
     </context-param>
@@ -31,7 +31,22 @@
     <context-param>
         <param-name>password</param-name>
         <param-value>admin</param-value>
+    </context-param>                       -->
+    
+     <!-- Begin Spring-specific configuration -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
     </context-param>
+        
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+    <!-- END Spring configuration -->
+    
     <servlet>
         <servlet-name>AuthorController</servlet-name>
         <servlet-class>edu.wctc.mpatel.bookwebapp1.controller.AuthorController</servlet-class>
