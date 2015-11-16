@@ -4,6 +4,7 @@ import edu.wctc.mpatel.bookwebapp1.entity.Author;
 import edu.wctc.mpatel.bookwebapp1.entity.Book;
 import edu.wctc.mpatel.bookwebapp1.service.AuthorService;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -14,6 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
@@ -40,6 +44,7 @@ public class AuthorController extends HttpServlet {
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String HOME_PAGE_ACTION = "homePage";
+    private static final String AJAX_LIST_ACTION = "listAjax";
     private static final String ADD_BOOK_TO_AUTHOR = "addBookToAuthor";
 
   
@@ -61,7 +66,7 @@ public class AuthorController extends HttpServlet {
         WebApplicationContext ctx
                 = WebApplicationContextUtils.getWebApplicationContext(sctx);
         AuthorService authService = (AuthorService) ctx.getBean("authorService");
-
+        PrintWriter out  = response.getWriter();
         try {
             Author author;
             Set<Book> books = new HashSet<>();
@@ -84,6 +89,26 @@ public class AuthorController extends HttpServlet {
                     this.refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
+                case AJAX_LIST_ACTION:
+                    List<Author> authors = authService.findAll();
+                    JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+                    
+                    authors.forEach((authorObj)->{
+                    jsonArrayBuilder.add(
+                    Json.createObjectBuilder()
+                            .add("authorId", authorObj.getAuthorId())
+                            .add("authorName", authorObj.getAuthorName())
+                            .add("dateCreated", authorObj.getDateCreated().toString())
+                    );
+                    
+                    });
+                    JsonArray authorsJson = jsonArrayBuilder.build();
+                    response.setContentType("application/json");
+                    out.write(authorsJson.toString());
+                    out.flush();
+                    return;
+                    
+                    
 
                 case ADD_ACTION:
                     if (authorName == null) {
