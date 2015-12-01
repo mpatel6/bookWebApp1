@@ -57,6 +57,11 @@
         <sec:intercept-url pattern="/loginerror.jsp" 
                            access="isAnonymous()" requires-channel="https"/>
         
+    <!--    ONly managers can delete author
+                <sec:intercept-url 
+            pattern="/api/v1/authors/**" method="DELETE" 
+            access="hasAnyRole('ROLE_MGR')" requires-channel="https" /> -->
+         
         <sec:intercept-url 
             pattern="/**" 
             access="hasAnyRole('ROLE_USER', 'ROLE_MGR')" requires-channel="https" />
