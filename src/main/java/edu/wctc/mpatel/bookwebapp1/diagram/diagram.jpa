@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jpa:entity-mappings status="GENERATED" jaxb-support="false" id="_144877107691944" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <jpa:entity jaxb-root-element="false" static-metamodel="false" abstract="false" class="Author" visibile="true" minimized="false" id="_144877107691947">
+        <jpa:attributes>
+            <jpa:id name="authorId" attribute-type="Integer" visibile="true" id="_144877107691949">
+                <jpa:column name="author_id" unique="false" nullable="false" insertable="true" updatable="true" table="author"/>
+                <jpa:generated-value strategy="AUTO"/>
+            </jpa:id>
+            <jpa:basic name="authorName" optional="true" attribute-type="String" visibile="true" id="_144877107691950">
+                <jpa:column name="author_name" unique="false" nullable="true" insertable="true" updatable="true" table="author" length="80"/>
+            </jpa:basic>
+            <jpa:basic name="dateCreated" optional="true" attribute-type="java.util.Date" visibile="true" id="_144877107691951">
+                <jpa:column name="date_created" unique="false" nullable="true" insertable="true" updatable="true" table="author"/>
+                <jpa:temporal>DATE</jpa:temporal>
+            </jpa:basic>
+            <jpa:one-to-many name="bookCollection" target-entity="Book" mapped-by="authorId" connected-entity-id="_144877107691948" connected-attribute-id="_144877107692056" visibile="true" id="_144877107691952"/>
+        </jpa:attributes>
+        <jpa:table name="author"/>
+    </jpa:entity>
+    <jpa:entity jaxb-root-element="false" static-metamodel="false" abstract="false" class="Book" visibile="true" minimized="false" id="_144877107691948">
+        <jpa:attributes>
+            <jpa:id name="bookId" attribute-type="Integer" visibile="true" id="_144877107692053">
+                <jpa:column name="book_id" unique="false" nullable="false" insertable="true" updatable="true" table="book"/>
+                <jpa:generated-value strategy="AUTO"/>
+            </jpa:id>
+            <jpa:basic name="title" optional="true" attribute-type="String" visibile="true" id="_144877107692054">
+                <jpa:column name="title" unique="false" nullable="true" insertable="true" updatable="true" table="book" length="45"/>
+            </jpa:basic>
+            <jpa:basic name="isbn" optional="true" attribute-type="String" visibile="true" id="_144877107692055">
+                <jpa:column name="isbn" unique="false" nullable="true" insertable="true" updatable="true" table="book" length="45"/>
+            </jpa:basic>
+            <jpa:many-to-one name="authorId" target-entity="Author" primaryKey="false" connected-entity-id="_144877107691947" connected-attribute-id="_144877107691952" visibile="true" id="_144877107692056">
+                <jpa:join-column name="author_id" referenced-column-name="author_id" unique="false" nullable="true" insertable="true" updatable="true"/>
+            </jpa:many-to-one>
+        </jpa:attributes>
+        <jpa:table name="book"/>
+    </jpa:entity>
+    <jpa:diagram id="_144877107691945">
+        <plane elementRef="_144877107691944" id="_144877107691946_p"/>
+    </jpa:diagram>
+</jpa:entity-mappings>
