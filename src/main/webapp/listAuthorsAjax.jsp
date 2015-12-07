@@ -15,7 +15,7 @@
     </head>
     <body class="authorList">
         <h1>Author List Using AJAX</h1>
-     <!--   <form  name="listForm" method="POST" action="AuthorController">-->
+   <form  name="listForm" method="POST" action="AuthorController">
             <sec:csrfInput />
             <input type="submit" name="action" value="homePage"/> 
             
@@ -38,7 +38,7 @@
                     
                 </tbody>
             </table>
-     <!--   </form>-->
+       </form>
       
             
             

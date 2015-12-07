@@ -35,7 +35,8 @@
     
       <!-- Begin Spring Security Config -->
       <!-- begin Spring Security config -->
-    <sec:global-method-security secured-annotations="enabled" />
+   <!-- Tag not required for rest
+    <sec:global-method-security secured-annotations="enabled" /> -->
 
     <!-- Don't SSL encrypt static resources -->
     <sec:http pattern="/resources/**" security="none"/>

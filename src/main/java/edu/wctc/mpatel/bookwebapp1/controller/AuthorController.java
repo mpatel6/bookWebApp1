@@ -33,7 +33,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class AuthorController extends HttpServlet {
 
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
-    private static final String LIST_PAGE = "/listAuthors.jsp";
+    private static final String LIST_PAGE = "/listAuthorsAjax.jsp";
     private static final String ADD_PAGE = "/authorInputForm.jsp";
     private static final String UPDATE_PAGE = "/authorEditForm.jsp";
     private static final String HOME_PAGE = "/index.html";
@@ -89,24 +89,24 @@ public class AuthorController extends HttpServlet {
                     this.refreshList(request, authService);
                     destination = LIST_PAGE;
                     break;
-                case AJAX_LIST_ACTION:
-                    List<Author> authors = authService.findAll();
-                    JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-                    
-                    authors.forEach((authorObj)->{
-                    jsonArrayBuilder.add(
-                    Json.createObjectBuilder()
-                            .add("authorId", authorObj.getAuthorId())
-                            .add("authorName", authorObj.getAuthorName())
-                            .add("dateCreated", authorObj.getDateCreated().toString())
-                    );
-                    
-                    });
-                    JsonArray authorsJson = jsonArrayBuilder.build();
-                    response.setContentType("application/json");
-                    out.write(authorsJson.toString());
-                    out.flush();
-                    return;
+//                case AJAX_LIST_ACTION:
+//                    List<Author> authors = authService.findAll();
+//                    JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+//                    
+//                    authors.forEach((authorObj)->{
+//                    jsonArrayBuilder.add(
+//                    Json.createObjectBuilder()
+//                            .add("authorId", authorObj.getAuthorId())
+//                            .add("authorName", authorObj.getAuthorName())
+//                            .add("dateCreated", authorObj.getDateCreated().toString())
+//                    );
+//                    
+//                    });
+//                    JsonArray authorsJson = jsonArrayBuilder.build();
+//                    response.setContentType("application/json");
+//                    out.write(authorsJson.toString());
+//                    out.flush();
+//                    return;
                     
                     
 

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jpa:entity-mappings status="GENERATED" jaxb-support="false" id="_144893827574413" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <jpa:entity jaxb-root-element="false" compositePrimaryKeyType="NONE" static-metamodel="false" abstract="false" class="Author" visibile="true" minimized="false" id="_144893827590916">
+        <annotation>@javax.xml.bind.annotation.XmlRootElement</annotation>
+        <jpa:attributes>
+            <jpa:id name="authorId" attribute-type="Integer" visibile="true" id="_144893827591117">
+                <jpa:column name="author_id"/>
+                <jpa:generated-value strategy="IDENTITY"/>
+                <jpa:sequence-generator name="author_id"/>
+            </jpa:id>
+            <jpa:basic name="authorName" attribute-type="String" visibile="true" id="_144893827591418">
+                <annotation>
+                    <name>javax.validation.constraints.Size</name>
+                </annotation>
+                <jpa:column name="author_name"/>
+            </jpa:basic>
+            <jpa:basic name="dateCreated" attribute-type="java.util.Date" visibile="true" id="_144893827591519">
+                <jpa:column name="date_created"/>
+                <jpa:temporal>DATE</jpa:temporal>
+            </jpa:basic>
+            <jpa:one-to-many name="bookSet" target-entity="Book" mapped-by="authorId" collection-type="java.util.Set" connected-entity-id="_144893827603721" connected-attribute-id="_144893827603725" visibile="true" id="_144893827591520">
+                <jpa:cascade>
+                    <jpa:cascade-all/>
+                </jpa:cascade>
+            </jpa:one-to-many>
+        </jpa:attributes>
+        <jpa:named-query name="Author.findAll">
+            <jpa:query>SELECT a FROM Author a</jpa:query>
+        </jpa:named-query>
+        <jpa:named-query name="Author.findByAuthorId">
+            <jpa:query>SELECT a FROM Author a WHERE a.authorId = :authorId</jpa:query>
+        </jpa:named-query>
+        <jpa:named-query name="Author.findByAuthorName">
+            <jpa:query>SELECT a FROM Author a WHERE a.authorName = :authorName</jpa:query>
+        </jpa:named-query>
+        <jpa:named-query name="Author.findByDateCreated">
+            <jpa:query>SELECT a FROM Author a WHERE a.dateCreated = :dateCreated</jpa:query>
+        </jpa:named-query>
+        <jpa:table name="author"/>
+    </jpa:entity>
+    <jpa:entity jaxb-root-element="false" compositePrimaryKeyType="NONE" static-metamodel="false" abstract="false" class="Book" visibile="true" minimized="false" id="_144893827603721">
+        <annotation>@javax.xml.bind.annotation.XmlRootElement</annotation>
+        <jpa:attributes>
+            <jpa:id name="bookId" attribute-type="Integer" visibile="true" id="_144893827603722">
+                <jpa:column name="book_id"/>
+                <jpa:generated-value strategy="IDENTITY"/>
+                <jpa:sequence-generator name="book_id"/>
+            </jpa:id>
+            <jpa:basic name="title" attribute-type="String" visibile="true" id="_144893827603723">
+                <annotation>
+                    <name>javax.validation.constraints.Size</name>
+                </annotation>
+                <jpa:column name="title"/>
+            </jpa:basic>
+            <jpa:basic name="isbn" attribute-type="String" visibile="true" id="_144893827603724">
+                <annotation>
+                    <name>javax.validation.constraints.Size</name>
+                </annotation>
+                <jpa:column name="isbn"/>
+            </jpa:basic>
+            <jpa:many-to-one name="authorId" target-entity="Author" primaryKey="false" connected-entity-id="_144893827590916" connected-attribute-id="_144893827591520" visibile="true" id="_144893827603725">
+                <jpa:join-column name="author_id" referenced-column-name="author_id"/>
+            </jpa:many-to-one>
+        </jpa:attributes>
+        <jpa:named-query name="Book.findAll">
+            <jpa:query>SELECT b FROM Book b</jpa:query>
+        </jpa:named-query>
+        <jpa:named-query name="Book.findByBookId">
+            <jpa:query>SELECT b FROM Book b WHERE b.bookId = :bookId</jpa:query>
+        </jpa:named-query>
+        <jpa:named-query name="Book.findByTitle">
+            <jpa:query>SELECT b FROM Book b WHERE b.title = :title</jpa:query>
+        </jpa:named-query>
+        <jpa:named-query name="Book.findByIsbn">
+            <jpa:query>SELECT b FROM Book b WHERE b.isbn = :isbn</jpa:query>
+        </jpa:named-query>
+        <jpa:table name="book"/>
+    </jpa:entity>
+    <jpa:diagram id="_144893827574414">
+        <plane elementRef="_144893827574413" id="_144893827574415_p"/>
+    </jpa:diagram>
+</jpa:entity-mappings>
