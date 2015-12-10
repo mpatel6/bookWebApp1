@@ -3,6 +3,7 @@ package edu.wctc.mpatel.bookwebapp1.controller;
 import edu.wctc.mpatel.bookwebapp1.entity.Author;
 import edu.wctc.mpatel.bookwebapp1.entity.Book;
 import edu.wctc.mpatel.bookwebapp1.service.AuthorService;
+import edu.wctc.mpatel.bookwebapp1.service.MailService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
@@ -45,6 +46,7 @@ public class AuthorController extends HttpServlet {
     private static final String DELETE_ACTION = "delete";
     private static final String HOME_PAGE_ACTION = "homePage";
     private static final String AJAX_LIST_ACTION = "listAjax";
+    private static final String EMAIL_ACTION = "email";
     private static final String ADD_BOOK_TO_AUTHOR = "addBookToAuthor";
 
   
@@ -66,6 +68,7 @@ public class AuthorController extends HttpServlet {
         WebApplicationContext ctx
                 = WebApplicationContextUtils.getWebApplicationContext(sctx);
         AuthorService authService = (AuthorService) ctx.getBean("authorService");
+        MailService mailService = (MailService) ctx.getBean("mailService");
         PrintWriter out  = response.getWriter();
         try {
             Author author;
@@ -187,6 +190,11 @@ public class AuthorController extends HttpServlet {
                 case HOME_PAGE_ACTION:
                     //response.sendRedirect("index.html");
                     destination = HOME_PAGE;
+                    break;
+                    
+                  case EMAIL_ACTION:
+                    mailService.sendMessage("mpatel6@my.wctc.edu");
+                    destination = LIST_PAGE;
                     break;
 
                 default:

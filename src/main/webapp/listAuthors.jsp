@@ -59,6 +59,7 @@
                 </c:forEach>
             </table>
         </form>
+            <a href="AuthorController?action=email">Click this link to send email</a>
         <c:if test="${errMsg != null}">
             <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
                 ${errMsg}</p>
